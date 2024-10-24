@@ -3,57 +3,13 @@ import { NativeBaseProvider, Button, Text, Center } from 'native-base';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'; 
+import DashboardScreen from './src/Screens/DashboardScreen';
+import EntriesScreen from './src/Screens/EntriesScreen';
+import ReportScreen from './src/Screens/ReportScreen';
+import ProfileScreen from './src/Screens/ProfileScreen'
+import ModelScreen from './src/Screens/ModelScreen';
 
 const Tab = createBottomTabNavigator();
-
-// Primer componente de la pantalla
-const DashboardScreen = () => {
-  return (
-    <Center flex={1}>
-      <Text fontSize="lg" mb={4}>Home</Text>
-      <Button onPress={() => console.log("Home Button!")}>Home Button</Button>
-    </Center>
-  );
-};
-
-// Segundo componente de la pantalla
-const EntriesScreen = () => {
-  return (
-    <Center flex={1}>
-      <Text fontSize="lg" mb={4}>Settings</Text>
-      <Button onPress={() => console.log("Settings Button!")}>Settings Button</Button>
-    </Center>
-  );
-};
-
-// Tercer componente de la pantalla
-const ReportScreen = () => {
-  return (
-    <Center flex={1}>
-      <Text fontSize="lg" mb={4}>Reports</Text>
-      <Button onPress={() => console.log("Reports Button!")}>Reports Button</Button>
-    </Center>
-  );
-};
-
-// Cuarto componente de la pantalla
-const ProfileScreen = () => {
-  return (
-    <Center flex={1}>
-      <Text fontSize="lg" mb={4}>Profile</Text>
-      <Button onPress={() => console.log("Profile Button!")}>Profile Button</Button>
-    </Center>
-  );
-};
-
-const ModelScreen = () => {
-  return (
-    <Center flex={1}>
-      <Text fontSize="lg" mb={4}>Model</Text>
-      <Button onPress={() => console.log("Model Button!")}>Model Button</Button>
-    </Center>
-  );
-};
 
 // Configuración del navegador
 const App = () => {
