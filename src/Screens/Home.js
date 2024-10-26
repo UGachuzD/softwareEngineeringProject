@@ -38,8 +38,8 @@ const Home = () => {
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       <Tab.Screen name="Entries" component={EntriesScreen} />
       <Tab.Screen name="Reports" component={ReportScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="Model" component={ModelScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 };

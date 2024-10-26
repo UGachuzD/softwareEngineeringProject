@@ -34,5 +34,5 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# access
-src/firebase/credentials.js
+# Environment variables
+.env
