@@ -14,7 +14,8 @@ const Tab = createBottomTabNavigator();
 const Home = () => {
   return (
     <Tab.Navigator
-      initialRouteName="Dashboard" // Establece Dashboard como la pestaña predeterminada
+      // Establece Dashboard como la pestaña predeterminada
+      initialRouteName="Dashboard" 
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
           let iconName;

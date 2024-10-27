@@ -12,7 +12,7 @@ import {
   Icon,
 } from "native-base";
 import { getAuth, signOut } from "firebase/auth";
-import { firestore } from "../firebase/credentials";
+import { firestore } from "../firebase/firebaseConfig";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -26,6 +26,8 @@ const ProfileScreen = () => {
   const [nivelGlucosa, setNivelGlucosa] = useState("");
   const [carbIngeridos, setCarbIngeridos] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState("");
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -68,11 +70,16 @@ const ProfileScreen = () => {
           height: altura,
           weight: peso,
         });
-        console.log("Datos de altura y peso actualizados en Firestore");
+        setUpdateMessage("Datos actualizados correctamente");
+      } else {
+        setUpdateMessage("Error: Usuario no autenticado");
       }
-      setShowModal(false);
     } catch (error) {
+      setUpdateMessage("Error al actualizar los datos");
       console.error("Error al actualizar los datos:", error);
+    } finally {
+      setShowUpdateModal(true); // Mostrar modal de resultado
+      setShowModal(false); // Cerrar el modal de edición
     }
   };
 
@@ -123,6 +130,7 @@ const ProfileScreen = () => {
           Cerrar sesión
         </Button>
 
+        {/* Modal de edición */}
         <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
           <Modal.Content>
             <Modal.CloseButton />
@@ -147,6 +155,7 @@ const ProfileScreen = () => {
                     bg="gray.100"
                     InputLeftElement={<Icon as={<MaterialIcons name="height" />} size={5} ml="2" color="muted.400" />}
                     placeholder="cm"
+                    keyboardType="numeric"
                   />
                 </FormControl>
 
@@ -158,36 +167,7 @@ const ProfileScreen = () => {
                     bg="gray.100"
                     InputLeftElement={<Icon as={<MaterialIcons name="fitness-center" />} size={5} ml="2" color="muted.400" />}
                     placeholder="kg"
-                  />
-                </FormControl>
-
-                <FormControl>
-                  <FormControl.Label>Horas de Sueño</FormControl.Label>
-                  <Input
-                    value={horasSueno}
-                    isDisabled={true}
-                    bg="gray.200"
-                    InputLeftElement={<Icon as={<MaterialIcons name="bedtime" />} size={5} ml="2" color="muted.400" />}
-                  />
-                </FormControl>
-
-                <FormControl>
-                  <FormControl.Label>Nivel de Glucosa</FormControl.Label>
-                  <Input
-                    value={nivelGlucosa}
-                    isDisabled={true}
-                    bg="gray.200"
-                    InputLeftElement={<Icon as={<MaterialIcons name="bloodtype" />} size={5} ml="2" color="muted.400" />}
-                  />
-                </FormControl>
-
-                <FormControl>
-                  <FormControl.Label>Carbohidratos Ingeridos</FormControl.Label>
-                  <Input
-                    value={carbIngeridos}
-                    isDisabled={true}
-                    bg="gray.200"
-                    InputLeftElement={<Icon as={<MaterialIcons name="restaurant" />} size={5} ml="2" color="muted.400" />}
+                    keyboardType="numeric"
                   />
                 </FormControl>
 
@@ -196,6 +176,22 @@ const ProfileScreen = () => {
                 </Button>
               </VStack>
             </Modal.Body>
+          </Modal.Content>
+        </Modal>
+
+        {/* Modal de confirmación de actualización */}
+        <Modal isOpen={showUpdateModal} onClose={() => setShowUpdateModal(false)}>
+          <Modal.Content maxWidth="400px">
+            <Modal.CloseButton />
+            <Modal.Header>Actualización</Modal.Header>
+            <Modal.Body>
+              <Text>{updateMessage}</Text>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onPress={() => setShowUpdateModal(false)} bg="teal.700" _text={{ color: "white" }}>
+                Cerrar
+              </Button>
+            </Modal.Footer>
           </Modal.Content>
         </Modal>
       </Center>
