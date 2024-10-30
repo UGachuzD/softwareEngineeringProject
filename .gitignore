@@ -36,3 +36,6 @@ yarn-error.*
 
 # Environment variables
 .env
+
+#Modelo
+BackEnd/model_random_forest.pkl
