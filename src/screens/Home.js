@@ -23,9 +23,7 @@ const Home = () => {
             iconName = 'home'; 
           } else if (route.name === 'Entries') {
             iconName = 'calendar'; 
-          } else if (route.name === 'Reports') {
-            iconName = 'bar-chart';
-          } else if (route.name === 'Profile') {
+          }else if (route.name === 'Profile') {
             iconName = 'user';
           } else if (route.name === 'Model') {
             iconName = 'codepen';
@@ -38,7 +36,6 @@ const Home = () => {
     >
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       <Tab.Screen name="Entries" component={EntriesScreen} />
-      <Tab.Screen name="Reports" component={ReportScreen} />
       <Tab.Screen name="Model" component={ModelScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>

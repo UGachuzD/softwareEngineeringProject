@@ -77,28 +77,36 @@ const DashboardScreen = () => {
 
   return (
     <NativeBaseProvider>
-      <Center flex={1} bg="gray.100">
-        <ScrollView>
-          <Center>
-            {imageUri ? (
-              <Image source={{ uri: imageUri }} alt="Imagen de predicción" size="2xl" />
-            ) : (
-              <Text color="gray.500">Imagen no disponible</Text>
-            )}
-          </Center>
-
-          <VStack space={2} mt={4}>
-            {csvData.length > 0 ? (
-              csvData.map((row, index) => (
-                <Text key={index} color="gray.700">{row.join(', ')}</Text>
-              ))
-            ) : (
-              <Text color="gray.500">Contenido del CSV aparecerá aquí...</Text>
-            )}
-          </VStack>
-        </ScrollView>
+  <Center flex={1} bg="gray.100">
+    <ScrollView>
+      <Center>
+        {imageUri ? (
+          <Image
+            source={{ uri: imageUri }}
+            alt="Imagen de predicción"
+            width={400} // Esto hará que la imagen ocupe el 100% del ancho disponible
+            height={200} // Ajusta la altura según lo que necesites (puedes cambiar este valor)
+          />
+        ) : (
+          <Text color="gray.500">Imagen no disponible</Text>
+        )}
       </Center>
-    </NativeBaseProvider>
+
+      <Center>  
+      <VStack space={2} mt={4}>
+        {csvData.length > 0 ? (
+          csvData.map((row, index) => (
+            <Text key={index} color="gray.700">{row.join(', ')}</Text>
+          ))
+        ) : (
+          <Text color="gray.500">Contenido del CSV aparecerá aquí...</Text>
+        )}
+      </VStack>
+      </Center>
+    </ScrollView>
+  </Center>
+</NativeBaseProvider>
+
   );
 };
 

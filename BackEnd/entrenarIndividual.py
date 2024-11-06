@@ -8,10 +8,7 @@ import re
 
 def procesar_glucosaIndividual(user_id):
     # Inicializar la aplicación de Firebase Admin
-    cred = credentials.Certificate('BackEnd/appdiabetes-75037-firebase-adminsdk-cm6u3-4b8d33055b.json')  # Reemplaza con la ruta a tu archivo JSON
-    firebase_admin.initialize_app(cred)
     db = firestore.client()
-
     try:
         modelo_diabetes = joblib.load('BackEnd/model_random_forest.pkl')
     except FileNotFoundError:
@@ -62,12 +59,13 @@ def procesar_glucosaIndividual(user_id):
 
 
     # Extrae las características necesarias
+    #date,calories,heart_rate,steps,basal_rate,bolus_volume_delivered,carb_input
     features = [[
         float(entry_data.get('CaloriasQuemadas', 0)),
         float(entry_data.get('RitmoCardiaco', 0)),
-        float(entry_data.get('steps', 0)),  # Asegúrate de tener este campo en tu entrada
-        float(entry_data.get('UnidadesCorrecion', 0)),  # Agrega este campo según tu lógica
-        float(entry_data.get('UnidadesInsulina', 0)),
+        float(entry_data.get('Pasos', 0)),  # Asegúrate de tener este campo en tu entrada
+        float(entry_data.get('TasaBasal', 0)),  # Agrega este campo según tu lógica
+        float(entry_data.get('VolumenBoloAdministrado', 0)),
         float(entry_data.get('CarbIngeridos', 0))
     ]]
     
@@ -104,4 +102,3 @@ def procesar_glucosaIndividual(user_id):
     plt.tight_layout()
     plt.savefig(f'BackEnd/SalidasImagenes/{user_id}_salida.jpg')
 
-procesar_glucosaIndividual("dRApY844yTORDrvXh7ZZ64U58bu2")

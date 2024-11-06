@@ -3,8 +3,19 @@ import os
 import threading
 from entrenar import procesar_glucosa
 from entrenarIndividual import procesar_glucosaIndividual
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+# Inicializar Firebase fuera de cualquier función
+if not firebase_admin._apps:
+    cred = credentials.Certificate('BackEnd/appdiabetes-75037-firebase-adminsdk-cm6u3-4b8d33055b.json')  # Reemplaza con la ruta a tu archivo JSON
+    firebase_admin.initialize_app(cred)
+
+db = firestore.client()
 
 app = Flask(__name__)
+
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Ruta del archivo actual
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
@@ -20,6 +31,16 @@ def train_model_in_background(file_path):
     except Exception as e:
         print(f"Error al procesar el archivo: {str(e)}")
 
+
+def train_model_individual(userID):
+    try:
+        procesar_glucosaIndividual(userID)
+        print(f"Modelo actualizado para el usuario: '{userID}'.")
+    except Exception as e:
+        print(f"Error al procesar la petición: {str(e)}")
+
+
+
 @app.route('/api/train-model/<user_id>', methods=['GET'])
 def train_model(user_id):
     file_path = os.path.join(UPLOAD_FOLDER, f'{user_id}_latest.csv')
@@ -29,6 +50,13 @@ def train_model(user_id):
     
     threading.Thread(target=train_model_in_background, args=(file_path,)).start()
     return jsonify(message="Entrenamiento del modelo iniciado."), 202
+    
+@app.route('/api/ModeloEntradaIndividual/<user_id>', methods=['GET'])
+def train_modelInd(user_id):    
+    threading.Thread(target=train_model_individual, args=(user_id,)).start()
+    return jsonify(message="Entrenamiento del modelo actualizado iniciado."), 202
+
+
 
 @app.route('/api/upload-csv/<user_id>', methods=['POST'])
 def upload_csv(user_id):

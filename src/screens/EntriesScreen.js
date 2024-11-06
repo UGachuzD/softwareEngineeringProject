@@ -15,12 +15,15 @@ import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Platform } from 'react-native';
+import axios from 'axios';
+import { Alert } from 'react-native';
+import { IPHOSTLOCAL } from "@env";
 
 const EntriesScreen = () => {
-  const [NivelGlucosa, setNivelGlucosa] = useState('');
+  const [Pasos, setPasos] = useState('');
   const [CarbIngeridos, setCarbIngeridos] = useState('');
-  const [UnidadesInsulina, setUnidadesInsulina] = useState('');
-  const [UnidadesCorrecion, setUnidadesCorrecion] = useState('');
+  const [TasaBasal, setTasaBasal] = useState('');
+  const [VolumenBoloAdministrado, setVolumenBoloAdministrado] = useState('');
   const [RitmoCardiaco, setRitmoCardiaco] = useState('');
   const [CaloriasQuemadas, setCaloriasQuemadas] = useState('');
   const [Fecha, setFecha] = useState(new Date());
@@ -32,34 +35,51 @@ const EntriesScreen = () => {
   const auth = getAuth();
 
   const cleanForm = () => {
-    setNivelGlucosa('');
+    setPasos('');
     setCarbIngeridos('');
-    setUnidadesInsulina('');
-    setUnidadesCorrecion('');
+    setTasaBasal('');
+    setVolumenBoloAdministrado('');
     setRitmoCardiaco('');
     setCaloriasQuemadas('');
     setFecha(new Date());
   };
+  const fetchData = async (endpoint) => {
+    const user = auth.currentUser;
+  
+    try {
+      const response = await axios.get(`${IPHOSTLOCAL}/api/${endpoint}/${user.uid}`, {
+        timeout: 10000,
+      });
+      Alert.alert('Success', response.data.message);
+    } catch (error) {
+      console.error(error);
+      const message = error.response ? error.response.data.message : 'Error de conexión';
+      Alert.alert('Error', message);
+    }
+  };
+  
 
   const handleAddEntry = async () => {
     const user = auth.currentUser;
-
+  
     if (user) {
       const entryData = {
         userId: user.uid,
-        NivelGlucosa,
-        CarbIngeridos,
-        UnidadesInsulina,
-        UnidadesCorrecion,
-        RitmoCardiaco,
         CaloriasQuemadas,
+        RitmoCardiaco,
+        Pasos,
+        TasaBasal,
+        VolumenBoloAdministrado,
+        CarbIngeridos,        
         Fecha,
         createdAt: new Date()
       };
-
+  
       try {
         await addDoc(collection(db, 'entries'), entryData);
         setModalMessage('Entrada añadida correctamente');
+        // Llamar fetchData después de añadir la entrada
+        await fetchData('ModeloEntradaIndividual'); 
       } catch (error) {
         setModalMessage('Error al añadir la entrada');
         console.error('Error al añadir la entrada: ', error);
@@ -72,6 +92,7 @@ const EntriesScreen = () => {
       cleanForm();
     }
   };
+  
 
   const handleDateChange = (event, selectedDate) => {
     if (event.type === "set" && selectedDate) {
@@ -99,18 +120,18 @@ const EntriesScreen = () => {
               </Text>
 
               <FormControl>
-                <FormControl.Label _text={{ color: 'black' }}>Nivel de glucosa</FormControl.Label>
+                <FormControl.Label _text={{ color: 'black' }}>Pasos</FormControl.Label>
                 <Input
-                  value={NivelGlucosa}
-                  onChangeText={setNivelGlucosa}
+                  value={Pasos}
+                  onChangeText={setPasos}
                   bg="white"
-                  placeholder="mg/dL"
+                  placeholder="0"
                   keyboardType="numeric"
                 />
               </FormControl>
 
               <FormControl>
-                <FormControl.Label _text={{ color: 'black' }}>Carbohidratos a consumir</FormControl.Label>
+                <FormControl.Label _text={{ color: 'black' }}>Carbohidratos Ingeridos</FormControl.Label>
                 <Input
                   value={CarbIngeridos}
                   onChangeText={setCarbIngeridos}
@@ -121,10 +142,10 @@ const EntriesScreen = () => {
               </FormControl>
 
               <FormControl>
-                <FormControl.Label _text={{ color: 'black' }}>Unidades de insulina</FormControl.Label>
+                <FormControl.Label _text={{ color: 'black' }}>Tasa Basal</FormControl.Label>
                 <Input
-                  value={UnidadesInsulina}
-                  onChangeText={setUnidadesInsulina}
+                  value={TasaBasal}
+                  onChangeText={setTasaBasal}
                   bg="white"
                   placeholder="UI"
                   keyboardType="numeric"
@@ -132,12 +153,12 @@ const EntriesScreen = () => {
               </FormControl>
 
               <FormControl>
-                <FormControl.Label _text={{ color: 'black' }}>Unidades de corrección</FormControl.Label>
+                <FormControl.Label _text={{ color: 'black' }}>Volumen Bolo Administrado</FormControl.Label>
                 <Input
-                  value={UnidadesCorrecion}
-                  onChangeText={setUnidadesCorrecion}
+                  value={VolumenBoloAdministrado}
+                  onChangeText={setVolumenBoloAdministrado}
                   bg="white"
-                  placeholder="UI"
+                  placeholder="mg/dL"
                   keyboardType="numeric"
                 />
               </FormControl>
