@@ -45,7 +45,7 @@ const App = () => {
 
   const selectAndUploadFile = async () => {
     try {
-      const result = await DocumentPicker.getDocumentAsync({ type: 'text/csv' });
+      const result = await DocumentPicker.getDocumentAsync({ type: '*/*' });
       if (!result.canceled) {
         const file = result.assets[0];
         setCsvFile({

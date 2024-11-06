@@ -20,7 +20,7 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # Ruta del archivo actual
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-IMAGE_DIR = os.path.join(BASE_DIR, 'SalidasImagenes')
+IMAGE_DIR = "../BackEnd/SalidasImagenes/"
 CSV_DIR = os.path.join(BASE_DIR, 'SalidasGlucosa')
 
 

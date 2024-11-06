@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 def procesar_glucosa(csv_file):
     df = pd.read_csv(csv_file)
     try:
-        modelo_diabetes = joblib.load('BackEnd/model_random_forest.pkl')
+        modelo_diabetes = joblib.load('../BackEnd/model_random_forest.pkl')
     except FileNotFoundError:
         print("Modelo no encontrado.")
         return
@@ -15,7 +15,7 @@ def procesar_glucosa(csv_file):
     df['Glucosa'] = modelo_diabetes.predict(features)
 
     df_result = df[["date", "Glucosa"]]
-    output_csv_path = f'BackEnd/SalidasGlucosa/{user_id}_glucosa_output.csv'
+    output_csv_path = f'../BackEnd/SalidasGlucosa/{user_id}_glucosa_output.csv'
     df_result.to_csv(output_csv_path, index=False)
 
     plt.figure(figsize=(12, 6))
