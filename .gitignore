@@ -39,3 +39,6 @@ yarn-error.*
 
 #Modelo
 BackEnd/model_random_forest.pkl
+
+#Firebase Admin access
+BackEnd/appdiabetes-75037-firebase-adminsdk-cm6u3-4b8d33055b.json

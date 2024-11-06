@@ -1,25 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { NativeBaseProvider, Center, Image, Text, ScrollView, VStack } from 'native-base';
 import axios from 'axios';
 import { Alert } from 'react-native';
 import { IPHOSTLOCAL } from "@env";
+import { getAuth } from 'firebase/auth';
+import { useFocusEffect } from '@react-navigation/native';
 
 const DashboardScreen = () => {
   const [csvData, setCsvData] = useState([]);
+  const [imageUri, setImageUri] = useState(null);
+  const auth = getAuth();
+  const user = auth.currentUser;
 
-  // Define los límites de glucosa
-  const hipoThreshold = 70;  // Límite inferior para hipo
-  const hiperThreshold = 180; // Límite superior para hiper
+  const hipoThreshold = 70;
+  const hiperThreshold = 180;
 
-  // Función para obtener el contenido del CSV al cargar la pantalla
   const fetchCsvData = async () => {
     try {
-      const response = await axios.get(`${IPHOSTLOCAL}/api/get-csv-content`); // Cambiar la IP
+      const response = await axios.get(`${IPHOSTLOCAL}/api/get-csv-content/${user.uid}`);
       const csvContent = response.data.content;
       const csvRows = csvContent.split('\n').map(row => row.split(','));
       setCsvData(csvRows);
 
-      // Analiza los datos del CSV
       analyzeGlucoseData(csvRows);
     } catch (error) {
       console.error("Error al obtener el CSV:", error);
@@ -27,15 +29,13 @@ const DashboardScreen = () => {
     }
   };
 
-  // Función para analizar los datos de glucosa y mostrar notificaciones
   const analyzeGlucoseData = (data) => {
     data.forEach(row => {
-      const date = row[0]; // Suponiendo que la fecha está en la primera columna
-      const glucoseValue = parseFloat(row[1]); // Suponiendo que el valor de glucosa está en la segunda columna
+      const date = row[0];
+      const glucoseValue = parseFloat(row[1]);
 
-      if (isNaN(glucoseValue)) return; // Si el valor no es un número, salta a la siguiente fila
+      if (isNaN(glucoseValue)) return;
 
-      // Verifica si hay hipo o hiper
       if (glucoseValue < hipoThreshold) {
         Alert.alert('Hipoglucemia detectada', `Fecha: ${date}, Glucosa: ${glucoseValue} mg/dL`);
       } else if (glucoseValue > hiperThreshold) {
@@ -44,31 +44,56 @@ const DashboardScreen = () => {
     });
   };
 
-  // Ejecuta las funciones al cargar el componente
-  useEffect(() => {
-    fetchCsvData();
-  }, []);
+  const fetchImage = async () => {
+    try {
+      const response = await fetch(`${IPHOSTLOCAL}/api/get-image/${user.uid}`);
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const imageUrl = URL.createObjectURL(blob);
+        setImageUri(imageUrl);
+      } else {
+        const fallbackResponse = await fetch(`${IPHOSTLOCAL}/api/get-image/default`);
+        if (fallbackResponse.ok) {
+          const fallbackBlob = await fallbackResponse.blob();
+          const fallbackImageUrl = URL.createObjectURL(fallbackBlob);
+          setImageUri(fallbackImageUrl);
+        } else {
+          throw new Error("Error al obtener la imagen de respaldo.");
+        }
+      }
+    } catch (error) {
+      console.error("Error al obtener la imagen:", error);
+      Alert.alert('Error', 'No se pudo cargar la imagen.');
+    }
+  };
 
-  // Cambia la ruta de la imagen aquí, usando require para imágenes locales
-  const imageUrl = require('../../BackEnd/salida.jpg'); // Asegúrate de que la ruta sea correcta
+  useFocusEffect(
+    useCallback(() => {
+      fetchCsvData();
+      fetchImage();
+    }, [])
+  );
 
   return (
     <NativeBaseProvider>
       <Center flex={1} bg="gray.100">
-        <Text fontSize="xl" mb={4}>Resultados del Modelo</Text>
-        <Image source={imageUrl} alt="Gráfica de glucosa" size="2xl" mb={4} />
+        <ScrollView>
+          <Center>
+            {imageUri ? (
+              <Image source={{ uri: imageUri }} alt="Imagen de predicción" size="2xl" />
+            ) : (
+              <Text color="gray.500">Imagen no disponible</Text>
+            )}
+          </Center>
 
-        <ScrollView bg="white" p={4} rounded="lg" shadow={1} width="90%" maxHeight={200} mt={4}>
-          <Text fontSize="lg" bold color="black" mb={2}>
-            Contenido del CSV
-          </Text>
-          <VStack space={2}>
+          <VStack space={2} mt={4}>
             {csvData.length > 0 ? (
               csvData.map((row, index) => (
                 <Text key={index} color="gray.700">{row.join(', ')}</Text>
               ))
             ) : (
-              <Text color="gray.500">No se pudo cargar el contenido del CSV.</Text>
+              <Text color="gray.500">Contenido del CSV aparecerá aquí...</Text>
             )}
           </VStack>
         </ScrollView>

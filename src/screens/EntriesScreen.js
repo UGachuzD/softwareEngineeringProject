@@ -21,10 +21,10 @@ const EntriesScreen = () => {
   const [CarbIngeridos, setCarbIngeridos] = useState('');
   const [UnidadesInsulina, setUnidadesInsulina] = useState('');
   const [UnidadesCorrecion, setUnidadesCorrecion] = useState('');
-  const [Hora, setHora] = useState('');
-  const [showTimePicker, setShowTimePicker] = useState(false);
   const [RitmoCardiaco, setRitmoCardiaco] = useState('');
   const [CaloriasQuemadas, setCaloriasQuemadas] = useState('');
+  const [Fecha, setFecha] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
 
@@ -36,9 +36,9 @@ const EntriesScreen = () => {
     setCarbIngeridos('');
     setUnidadesInsulina('');
     setUnidadesCorrecion('');
-    setHora('');
     setRitmoCardiaco('');
     setCaloriasQuemadas('');
+    setFecha(new Date());
   };
 
   const handleAddEntry = async () => {
@@ -53,7 +53,7 @@ const EntriesScreen = () => {
         UnidadesCorrecion,
         RitmoCardiaco,
         CaloriasQuemadas,
-        Hora,
+        Fecha,
         createdAt: new Date()
       };
 
@@ -73,17 +73,19 @@ const EntriesScreen = () => {
     }
   };
 
-  const handleTimeChange = (event, selectedTime) => {
-    if (event.type === "set" && selectedTime) {
-      const hours = selectedTime.getHours();
-      const minutes = selectedTime.getMinutes().toString().padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-
-      // Convertir al formato de 12 horas
-      const adjustedHours = hours % 12 || 12;
-      setHora(`${adjustedHours.toString().padStart(2, '0')}:${minutes} ${ampm}`);
+  const handleDateChange = (event, selectedDate) => {
+    if (event.type === "set" && selectedDate) {
+      setFecha(selectedDate);
     }
-    setShowTimePicker(false);
+    setShowDatePicker(false);
+  };
+
+  // Formato de fecha en YYYY-MM-DD
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses comienzan en 0
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   return (
@@ -141,22 +143,22 @@ const EntriesScreen = () => {
               </FormControl>
 
               <FormControl>
-                <FormControl.Label _text={{ color: 'black' }}>Hora</FormControl.Label>
+                <FormControl.Label _text={{ color: 'black' }}>Fecha</FormControl.Label>
                 <Input
-                  value={Hora}
-                  onFocus={() => setShowTimePicker(true)}
+                  value={formatDate(Fecha)}
+                  onFocus={() => setShowDatePicker(true)}
                   bg="white"
-                  placeholder="hh:mm AM/PM"
+                  placeholder="AAAA-MM-DD"
+                  editable={false}
                 />
               </FormControl>
 
-              {showTimePicker && (
+              {showDatePicker && (
                 <DateTimePicker
-                  value={new Date()}
-                  mode="time"
-                  is24Hour={false}
+                  value={Fecha}
+                  mode="date"
                   display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={handleTimeChange}
+                  onChange={handleDateChange}
                 />
               )}
 

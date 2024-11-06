@@ -13,6 +13,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import { Alert, ActivityIndicator } from 'react-native';
 import { IPHOSTLOCAL } from "@env";
+import { getAuth } from 'firebase/auth';
 
 const App = () => {
   const [csvFile, setCsvFile] = useState(null);
@@ -20,10 +21,13 @@ const App = () => {
   const [fileContent, setFileContent] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const auth = getAuth();
+  const user = auth.currentUser;
+
   const fetchData = async (endpoint) => {
     try {
-      const response = await axios.get(`${IPHOSTLOCAL}/api/${endpoint}`, { //poner la propia ip
-        timeout: 10000, // Timeout de 10 segundos
+      const response = await axios.get(`${IPHOSTLOCAL}/api/${endpoint}/${user.uid}`, {
+        timeout: 10000,
       });
       Alert.alert('Success', response.data.message);
     } catch (error) {
@@ -35,7 +39,7 @@ const App = () => {
 
   const handleTrainModel = async () => {
     setLoading(true);
-    await fetchData('train-model'); // Llamada para entrenar el modelo
+    await fetchData('train-model');
     setLoading(false);
   };
 
@@ -57,7 +61,7 @@ const App = () => {
           type: file.mimeType,
         });
 
-        const response = await axios.post(`${IPHOSTLOCAL}/api/upload-csv`, formData, {
+        const response = await axios.post(`${IPHOSTLOCAL}/api/upload-csv/${user.uid}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
 
@@ -65,7 +69,7 @@ const App = () => {
         setFileInfo(`Archivo: ${file.name}\nTipo: ${file.mimeType}\nTamaño: ${file.size} bytes`);
 
         const content = await FileSystem.readAsStringAsync(file.uri);
-        setFileContent(content.split('\n').slice(0, 5).join('\n')); // Mostrar las primeras 5 líneas
+        setFileContent(content.split('\n').slice(0, 5).join('\n'));
       } else {
         Alert.alert('No file selected');
       }
